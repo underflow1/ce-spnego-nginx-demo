@@ -1,0 +1,13 @@
+[libdefaults]
+    default_realm = DOMAIN.LOCAL
+    dns_lookup_realm = false
+    dns_lookup_kdc = false
+
+[realms]
+    DOMAIN.LOCAL = {
+        kdc = domain.local
+    }
+
+[domain_realm]
+    .domain.local = DOMAIN.LOCAL
+    domain.local = DOMAIN.LOCAL
