@@ -1,6 +1,6 @@
 # SPNEGO Nginx Demo
 
-Минимальная демонстрация Kerberos/SPNEGO аутентификации. **Nginx** выполняет SPNEGO, backend только отображает данные. Без Python GSSAPI, без компиляции — только apt и pip.
+Минимальная демонстрация Kerberos/SPNEGO аутентификации. **Nginx** выполняет SPNEGO, backend только отображает данные. Без Python GSSAPI, без компиляции — только apt и pip. Проверено на Debian 13 (Trixie).
 
 ## Архитектура
 
@@ -97,6 +97,7 @@ sudo chmod 640 /etc/krb5.keytab
 
 - `server_name` — твой FQDN
 - `auth_gss_keytab` — путь к keytab (дефолта нет, обычно `/etc/krb5.keytab`)
+- `auth_gss_format_full 1` — чтобы `X-Remote-User` содержал `user@REALM` вместо только `user`
 
 Включить:
 
