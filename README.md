@@ -65,8 +65,11 @@ A-запись: `app.example.com` → IP сервера.
 ### 2.1. Зависимости
 
 ```bash
-apt install libnginx-mod-http-auth-spnego krb5-user
+apt install libnginx-mod-http-auth-spnego krb5-user chrony
+systemctl enable chrony && systemctl start chrony
 ```
+
+**Важно:** Kerberos требует синхронизации времени (допуск ~5 мин). Без NTP — 403. Проверить: `timedatectl status`.
 
 ### 2.2. krb5.conf
 
@@ -84,7 +87,6 @@ Nginx читает `/etc/krb5.conf` по умолчанию.
 Обычно кладут в `/etc/krb5.keytab` или `/etc/nginx/`. Права: владелец root, группа www-data, режим 640 — только nginx (www-data) может читать:
 
 ```bash
-sudo cp spnego-demo.keytab /etc/krb5.keytab
 sudo chown root:www-data /etc/krb5.keytab
 sudo chmod 640 /etc/krb5.keytab
 ```
@@ -94,7 +96,7 @@ sudo chmod 640 /etc/krb5.keytab
 Скопировать `nginx.conf.example` в `/etc/nginx/sites-available/`, поправить:
 
 - `server_name` — твой FQDN
-- `auth_gss_keytab` — путь к keytab (например `/etc/krb5.keytab`)
+- `auth_gss_keytab` — путь к keytab (дефолта нет, обычно `/etc/krb5.keytab`)
 
 Включить:
 
@@ -178,6 +180,7 @@ curl -vk -H "Host: app.example.com" https://127.0.0.1/
 
 | Симптом | Причина | Решение |
 |---------|---------|---------|
+| 403 Forbidden при 401→403 в access.log | Время на хосте рассинхронизировано (Kerberos допускает ~5 мин) | chrony, см. 2.1 |
 | 403 Forbidden, backend молчит | www-data не читает keytab | `chown root:www-data`, `chmod 640` |
 | Браузер не шлёт тикет | Сайт не в AuthServerAllowlist | Проверить `chrome://policy` |
 
